@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up — EventForge{% endblock %}
+
+{% block content %}
+<div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="flex justify-center">
+            <svg class="h-12 w-12 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+            </svg>
+        </div>
+        <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create your account</h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Already have an account?
+            <a href="/auth/login" class="font-semibold text-primary-600 hover:text-primary-500 transition-colors">Sign in</a>
+        </p>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white px-6 py-12 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl sm:px-12">
+            {% if error %}
+                <div class="mb-6 rounded-md bg-red-50 border border-red-200 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-red-800">{{ error }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form class="space-y-5" method="POST" action="/auth/register" data-validate>
+                <div>
+                    <label for="display_name" class="block text-sm font-medium leading-6 text-gray-900">Display Name</label>
+                    <div class="mt-2">
+                        <input id="display_name" name="display_name" type="text" required
+                               value="{{ form_data.display_name if form_data and form_data.display_name else '' }}"
+                               data-min-length="1"
+                               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 px-3"
+                               placeholder="Your display name">
+                    </div>
+                    {% if errors and errors.display_name %}
+                        <p class="mt-1 text-sm text-red-600">{{ errors.display_name }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
+                    <div class="mt-2">
+                        <input id="email" name="email" type="email" autocomplete="email" required
+                               value="{{ form_data.email if form_data and form_data.email else '' }}"
+                               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 px-3"
+                               placeholder="you@example.com">
+                    </div>
+                    {% if errors and errors.email %}
+                        <p class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username</label>
+                    <div class="mt-2">
+                        <input id="username" name="username" type="text" autocomplete="username" required
+                               value="{{ form_data.username if form_data and form_data.username else '' }}"
+                               data-min-length="3"
+                               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 px-3"
+                               placeholder="Choose a username (min 3 characters)">
+                    </div>
+                    {% if errors and errors.username %}
+                        <p class="mt-1 text-sm text-red-600">{{ errors.username }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+                    <div class="mt-2">
+                        <input id="password" name="password" type="password" autocomplete="new-password" required
+                               data-min-length="8"
+                               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 px-3"
+                               placeholder="Min 8 characters">
+                    </div>
+                    {% if errors and errors.password %}
+                        <p class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="confirm_password" class="block text-sm font-medium leading-6 text-gray-900">Confirm Password</label>
+                    <div class="mt-2">
+                        <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required
+                               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 px-3"
+                               placeholder="Re-enter your password">
+                    </div>
+                    {% if errors and errors.confirm_password %}
+                        <p class="mt-1 text-sm text-red-600">{{ errors.confirm_password }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="role" class="block text-sm font-medium leading-6 text-gray-900">I want to</label>
+                    <div class="mt-2">
+                        <select id="role" name="role"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 px-3 bg-white">
+                            <option value="Viewer" {% if form_data and form_data.role == 'Viewer' %}selected{% endif %}>Attend events</option>
+                            <option value="Project Manager" {% if form_data and form_data.role == 'Project Manager' %}selected{% endif %}>Organize events</option>
+                        </select>
+                    </div>
+                    {% if errors and errors.role %}
+                        <p class="mt-1 text-sm text-red-600">{{ errors.role }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 transition-colors">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm font-medium leading-6">
+                        <span class="bg-white px-6 text-gray-500">Already registered?</span>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <a href="/auth/login"
+                       class="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 transition-colors">
+                        Sign in to your account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

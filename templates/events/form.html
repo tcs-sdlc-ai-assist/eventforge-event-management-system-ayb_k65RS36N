@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Edit Event" if event else "Create Event" }} — EventForge{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <nav class="flex" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-2">
+                <li>
+                    <a href="/events" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Events</a>
+                </li>
+                <li>
+                    <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                </li>
+                <li>
+                    <span class="text-sm font-medium text-gray-900">{{ "Edit Event" if event else "Create Event" }}</span>
+                </li>
+            </ol>
+        </nav>
+        <h1 class="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{{ "Edit Event" if event else "Create Event" }}</h1>
+        <p class="mt-1 text-sm text-gray-500">{{ "Update your event details below." if event else "Fill in the details to create a new event." }}</p>
+    </div>
+
+    <form method="POST" action="{{ '/events/' ~ event.id ~ '/edit' if event else '/events/create' }}" data-validate class="space-y-8">
+
+        <!-- Event Details -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Event Details</h2>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+                    <input type="text" id="title" name="title" required maxlength="200" data-min-length="1"
+                           value="{{ event.title if event else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. Annual Tech Conference 2024">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="description" name="description" rows="4"
+                              class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              placeholder="Describe your event...">{{ event.description if event and event.description else '' }}</textarea>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="category_id" name="category_id"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="">— Select a category —</option>
+                        {% if categories is defined and categories %}
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if event and event.category_id and event.category_id|string == category.id|string %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <label for="capacity" class="block text-sm font-medium text-gray-700 mb-1">Total Capacity</label>
+                    <input type="number" id="capacity" name="capacity" required min="1" step="1"
+                           value="{{ event.capacity if event else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. 500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Date &amp; Time</h2>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="start_datetime" class="block text-sm font-medium text-gray-700 mb-1">Start Date &amp; Time</label>
+                    <input type="datetime-local" id="start_datetime" name="start_datetime" required
+                           value="{{ event.start_datetime.strftime('%Y-%m-%dT%H:%M') if event and event.start_datetime else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="end_datetime" class="block text-sm font-medium text-gray-700 mb-1">End Date &amp; Time</label>
+                    <input type="datetime-local" id="end_datetime" name="end_datetime" required
+                           value="{{ event.end_datetime.strftime('%Y-%m-%dT%H:%M') if event and event.end_datetime else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Venue Information -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Venue Information</h2>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label for="venue_name" class="block text-sm font-medium text-gray-700 mb-1">Venue Name</label>
+                    <input type="text" id="venue_name" name="venue_name" required maxlength="200"
+                           value="{{ event.venue_name if event else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. Convention Center">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label for="venue_address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <input type="text" id="venue_address" name="venue_address" required maxlength="500"
+                           value="{{ event.venue_address if event else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. 123 Main Street">
+                </div>
+
+                <div>
+                    <label for="venue_city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <input type="text" id="venue_city" name="venue_city" required maxlength="100"
+                           value="{{ event.venue_city if event else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. San Francisco">
+                </div>
+
+                <div>
+                    <label for="venue_state" class="block text-sm font-medium text-gray-700 mb-1">State / Province</label>
+                    <input type="text" id="venue_state" name="venue_state" maxlength="100"
+                           value="{{ event.venue_state if event and event.venue_state else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. California">
+                </div>
+
+                <div>
+                    <label for="venue_country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                    <input type="text" id="venue_country" name="venue_country" required maxlength="100"
+                           value="{{ event.venue_country if event else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. United States">
+                </div>
+
+                <div>
+                    <label for="venue_zip_code" class="block text-sm font-medium text-gray-700 mb-1">ZIP / Postal Code</label>
+                    <input type="text" id="venue_zip_code" name="venue_zip_code" maxlength="20"
+                           value="{{ event.venue_zip_code if event and event.venue_zip_code else '' }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="e.g. 94105">
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Types -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">Ticket Types</h2>
+                    <p class="mt-1 text-sm text-gray-500">Add one or more ticket types for your event.</p>
+                </div>
+                <button type="button" id="add-ticket-type-btn"
+                        class="inline-flex items-center rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Add Ticket Type
+                </button>
+            </div>
+
+            <div id="ticket-types-container" class="space-y-4">
+                {% if event and ticket_types is defined and ticket_types %}
+                    {% for tt in ticket_types %}
+                        <div class="ticket-type-row flex flex-wrap items-end gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50" data-index="{{ loop.index0 }}">
+                            <div class="flex-1 min-w-[180px]">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Ticket Name</label>
+                                <input type="text" name="ticket_type_name_{{ loop.index0 }}" required
+                                       value="{{ tt.name }}"
+                                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                       placeholder="e.g. General Admission">
+                            </div>
+                            <div class="w-32">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                                <input type="number" name="ticket_type_price_{{ loop.index0 }}" min="0" step="0.01" required
+                                       value="{{ tt.price }}"
+                                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                       placeholder="0.00">
+                            </div>
+                            <div class="w-32">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                                <input type="number" name="ticket_type_quantity_{{ loop.index0 }}" min="1" step="1" required
+                                       value="{{ tt.quantity }}"
+                                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                       placeholder="100">
+                            </div>
+                            <div>
+                                <button type="button" class="remove-ticket-type-btn inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        title="Remove ticket type">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ticket-type-row flex flex-wrap items-end gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50" data-index="0">
+                        <div class="flex-1 min-w-[180px]">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ticket Name</label>
+                            <input type="text" name="ticket_type_name_0" required
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                   placeholder="e.g. General Admission">
+                        </div>
+                        <div class="w-32">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                            <input type="number" name="ticket_type_price_0" min="0" step="0.01" required
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                   placeholder="0.00">
+                        </div>
+                        <div class="w-32">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                            <input type="number" name="ticket_type_quantity_0" min="1" step="1" required
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                   placeholder="100">
+                        </div>
+                        <div>
+                            <button type="button" class="remove-ticket-type-btn inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    title="Remove ticket type">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-end gap-4 pt-2">
+            <a href="{{ '/events/' ~ event.id if event else '/events' }}"
+               class="rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors">
+                Cancel
+            </a>
+            <button type="submit"
+                    class="rounded-md bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                {{ "Update Event" if event else "Create Event" }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/app.js"></script>
+{% endblock %}
